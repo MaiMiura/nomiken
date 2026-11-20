@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="飲み会クイズから資格試験の模擬まで。スマホ1台を回して遊べる検定アプリ。">
+<meta property="og:title" content="ノミケン">
+<meta property="og:description" content="飲み会クイズから資格試験の模擬まで。スマホ1台を回して遊べる検定アプリ。">
+<meta name="theme-color" content="#252e5c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ノミケン">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>ノミケン</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+/* Layout: one narrow phone column under an indigo noren header; packs as tanzaku (menu-tag) cards */
+:root{
+  --bg:#f1f2f8; --surface:#ffffff; --ink:#1b1f3a; --muted:#5b6185; --line:#d8dbea;
+  --noren:#252e5c; --noren-ink:#f4f1ff; --accent:#e3a300; --accent-ink:#1b1f3a; --accent-soft:#fff3cf;
+  --good:#1d8754; --good-soft:#e1f4ea; --bad:#c23d36; --bad-soft:#fbe5e3;
+  --qr-light:#ffffff; --qr-dark:#000000;
+  --display:"Dela Gothic One","Zen Kaku Gothic New","Hiragino Sans",sans-serif;
+  --body:"Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1229; --surface:#191d3c; --ink:#eceefb; --muted:#a2a7c9; --line:#2d335f;
+  --noren:#0a0c20; --noren-ink:#f4f1ff; --accent:#f2b72f; --accent-ink:#17142a; --accent-soft:#3a3218;
+  --good:#46c28a; --good-soft:#163527; --bad:#ff6d63; --bad-soft:#3d1c1d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1229; --surface:#191d3c; --ink:#eceefb; --muted:#a2a7c9; --line:#2d335f;
+  --noren:#0a0c20; --noren-ink:#f4f1ff; --accent:#f2b72f; --accent-ink:#17142a; --accent-soft:#3a3218;
+  --good:#46c28a; --good-soft:#163527; --bad:#ff6d63; --bad-soft:#3d1c1d; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--noren)}
+.wrap{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.noren{background:var(--noren);color:var(--noren-ink);margin-top:calc(-1 * env(safe-area-inset-top,0px));padding-top:env(safe-area-inset-top,0px)}
+header.noren .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:14px 10px}
+.logo{font-family:var(--display);font-size:1.6rem;letter-spacing:.04em;color:var(--accent);background:none;border:0;padding:0;cursor:pointer}
+.logo small{display:block;font-family:var(--body);font-size:.68rem;color:var(--noren-ink);opacity:.75;letter-spacing:.12em;font-weight:500}
+.slits{display:flex;gap:4px;height:10px;padding-bottom:0}
+.slits i{flex:1;background:var(--noren);border-radius:0 0 4px 4px}
+.slitsrow{background:var(--bg)}
+main{padding-block:16px 48px;display:flex;flex-direction:column;gap:18px}
+h1,h2,h3{text-wrap:balance;margin:0;line-height:1.35}
+h2.sec{font-size:.78rem;letter-spacing:.14em;color:var(--muted);font-weight:700}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px}
+label.fld{display:flex;flex-direction:column;gap:6px;font-size:.85rem;color:var(--muted);font-weight:500}
+input[type=text],textarea,select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px;width:100%}
+textarea{min-height:240px;font-size:.88rem;line-height:1.55}
+input:focus-visible,textarea:focus-visible,button:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.btn{font:inherit;font-weight:700;border:0;border-radius:12px;padding:14px 18px;cursor:pointer;background:var(--accent);color:var(--accent-ink);width:100%;font-size:1.02rem}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.small{width:auto;padding:8px 12px;font-size:.85rem}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1 1 140px}
+.muted{color:var(--muted)}.tiny{font-size:.8rem}
+.packs{display:flex;flex-direction:column;gap:10px}
+.pack{display:flex;align-items:stretch;gap:0;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;cursor:pointer;text-align:left;font:inherit;color:inherit;padding:0;width:100%}
+.pack .tag{writing-mode:vertical-rl;font-family:var(--display);background:var(--noren);color:var(--accent);padding:12px 8px;font-size:1.05rem;letter-spacing:.1em;display:flex;align-items:center;justify-content:center;min-width:42px}
+.pack .bd{padding:12px 14px;display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.pack .tt{font-weight:700;font-size:1.05rem}
+.pack .ds{font-size:.85rem;color:var(--muted)}
+.pack .meta{font-size:.75rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.chip{display:inline-block;font-size:.72rem;padding:2px 8px;border-radius:99px;background:var(--accent-soft);color:var(--ink);font-weight:700;margin-left:6px;vertical-align:2px}
+.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{flex:1;font:inherit;border:0;background:var(--surface);color:var(--ink);padding:10px 4px;cursor:pointer;font-size:.9rem}
+.seg button[aria-pressed=true]{background:var(--noren);color:var(--accent);font-weight:700}
+.qhead{display:flex;align-items:baseline;justify-content:space-between;gap:8px;font-variant-numeric:tabular-nums}
+.qno{font-family:var(--display);font-size:1.5rem}.qno small{font-family:var(--body);font-size:.9rem;color:var(--muted)}
+.timer{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.timer i{display:block;height:100%;background:var(--accent);width:100%;transition:width .1s linear}
+.timer.low i{background:var(--bad)}
+.qtext{font-size:1.2rem;font-weight:700;line-height:1.55}
+.choices{display:flex;flex-direction:column;gap:10px}
+.choice{display:flex;gap:12px;align-items:center;text-align:left;font:inherit;font-size:1rem;background:var(--surface);color:var(--ink);border:2px solid var(--line);border-radius:12px;padding:14px;cursor:pointer;min-height:58px}
+.choice b{font-family:var(--display);color:var(--muted);min-width:1.2em}
+.choice.ok{border-color:var(--good);background:var(--good-soft)}
+.choice.ng{border-color:var(--bad);background:var(--bad-soft)}
+.choice:disabled{cursor:default}
+.fb{border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:6px}
+.fb.ok{background:var(--good-soft)}.fb.ng{background:var(--bad-soft)}
+.fb .v{font-family:var(--display);font-size:1.2rem}.fb.ok .v{color:var(--good)}.fb.ng .v{color:var(--bad)}
+.score{text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center}
+.score .big{font-family:var(--display);font-size:3.4rem;line-height:1;font-variant-numeric:tabular-nums}
+.score .big small{font-size:1.2rem;color:var(--muted)}
+.stamp{font-family:var(--display);font-size:1.3rem;padding:6px 18px;border:3px solid currentColor;border-radius:8px;transform:rotate(-4deg);margin-top:6px}
+.stamp.pass{color:var(--good)}.stamp.fail{color:var(--bad)}
+.rank{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.rank li{display:grid;grid-template-columns:2.2em 1fr auto auto;gap:10px;align-items:center;padding:9px 2px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.rank li:last-child{border-bottom:0}
+.rank .n{font-family:var(--display);color:var(--muted);text-align:center}
+.rank li:nth-child(1) .n{color:var(--accent)}
+.rank .nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
+.rank .me{background:var(--accent-soft);border-radius:8px}
+.rank .tm{color:var(--muted);font-size:.8rem}
+.miss{display:flex;flex-direction:column;gap:12px}
+.miss div{border-left:3px solid var(--bad);padding-left:10px}
+.err{color:var(--bad);font-size:.85rem}
+pre.fmt{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;font-size:.78rem;overflow-x:auto;margin:0;white-space:pre}
+details summary{cursor:pointer;font-weight:700}
+.choice.picked{border-color:var(--accent);background:var(--accent-soft)}
+.handoff{display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center;padding-block:32px}
+.hname{font-family:var(--display);font-size:2rem;line-height:1.25;text-wrap:balance;word-break:break-all}
+.dare{display:flex;flex-direction:column;gap:8px;align-items:flex-start;background:var(--accent-soft);border-color:transparent}
+.dtext{font-weight:700;font-size:1.15rem}
+.gridwrap{overflow-x:auto}
+table.grid{border-collapse:collapse;width:100%;font-size:.85rem}
+.grid th,.grid td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:center;vertical-align:top}
+.grid th{font-size:.78rem;color:var(--muted);white-space:nowrap}
+.grid th:first-child,.grid td:first-child{text-align:left;min-width:13em}
+.grid .gq{display:block}.grid .ga{display:block;color:var(--muted);font-size:.78rem}
+.grid td.o{color:var(--good);font-weight:700}.grid td.x{color:var(--bad)}
+.sharebtn{font:inherit;font-size:.8rem;font-weight:700;background:transparent;color:var(--accent);border:1px solid var(--accent);border-radius:99px;padding:6px 12px;cursor:pointer;white-space:nowrap}
+.shareq{display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center}
+.qrbox{background:var(--qr-light);padding:14px;border-radius:12px;display:grid;place-items:center;width:268px;max-width:100%;aspect-ratio:1}
+.qrbox img,.qrbox canvas{max-width:100%;height:auto}
+.url{font-size:.75rem;word-break:break-all;color:var(--muted)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--noren);color:var(--noren-ink);padding:10px 16px;border-radius:99px;font-size:.9rem;z-index:20;max-width:calc(100% - 32px)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+
+<header class="noren"><div class="wrap">
+  <button class="logo" id="logo" type="button">ノミケン<small>飲み会から本番まで、検定アプリ</small></button>
+  <div style="display:flex;align-items:center;gap:10px;min-width:0"><span class="tiny" id="who" style="opacity:.85;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span><button class="sharebtn" id="shareBtn" type="button">QRで招待</button></div>
+</div></header>
+<div class="slitsrow"><div class="wrap slits"><i></i><i></i><i></i><i></i></div></div>
+<div class="wrap"><main id="app"></main></div>
+<div class="toast" id="toast" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+const APP_URL=location.origin+location.pathname;
+/* ---------- 収録問題集（アプリ同梱） ---------- */
+const BUILTIN = [
+{id:"nomikai",title:"飲み会検定",tag:"酒",desc:"お酒の雑学と宴会マナー。乾杯の前に腕試し。",passLine:70,
+ titles:[[90,"名人 ― 宴席の生き字引"],[70,"飲み会マイスター"],[40,"ほろ酔い研究生"],[0,"ソフトドリンク見習い"]],
+ q:[
+ ["ビールに苦みと香りを与える植物はどれ？","ホップ","大麦","酵母","コリアンダー","ホップはアサ科のつる植物。毬花（きゅうか）が苦みと爽やかな香りのもとです。","ビール"],
+ ["「生ビール」の日本での定義は？","熱処理していないビール","樽から注いだビール","冷やしていないビール","泡を立てないビール","業界の表示ルールでは、熱処理（パストリゼーション）をしていないものが「生」。瓶や缶でも生ビールはあります。","ビール"],
+ ["ビールを注ぐときに理想とされる液体と泡の比率は？","7：3","5：5","9：1","3：7","泡がふたの役割をして炭酸と香りを閉じ込めます。","ビール"],
+ ["お酌でビール瓶を持つとき、ラベルはどう向ける？","上に向ける","下に向ける","自分の側に向ける","手で隠す","銘柄が相手に見えるよう、ラベルを上にして右手で持ち、左手を添えて注ぐのが一般的です。","マナー"],
+ ["目上の人と乾杯するとき、グラスはどうする？","相手のグラスより少し低く当てる","相手より高く当てる","強めに当てて音を出す","必ず当てずに掲げるだけ","相手を立てる意味で、自分のグラスの縁を低くするのがマナーとされます。","マナー"],
+ ["日本で飲酒が法律で認められるのは何歳から？","20歳","18歳","19歳","21歳","2022年に成年年齢は18歳になりましたが、飲酒・喫煙は引き続き20歳から。","基礎"],
+ ["日本酒の主な原料は？","米・米麹・水","麦・麦麹・水","さつまいも・米麹・水","ぶどう・酵母・水","清酒は米・米麹・水が基本。醸造アルコールを加えるものもあります。","日本酒"],
+ ["「吟醸酒」と表示できる精米歩合の条件は？","60%以下","70%以下","50%以下","80%以下","精米歩合60%以下で吟醸造り。大吟醸は50%以下です。","日本酒"],
+ ["日本酒の「辛口・甘口」の目安としてラベルに書かれる数値は？","日本酒度","精米歩合","アルコール度数","製造年月","日本酒度がプラスほど辛口、マイナスほど甘口の傾向。酸度とあわせて見ます。","日本酒"],
+ ["「熱燗」はおよそ何℃？","50℃前後","35℃前後","40℃前後","60℃以上","人肌燗35℃、ぬる燗40℃、上燗45℃、熱燗50℃、飛び切り燗55℃以上が目安。","日本酒"],
+ ["本格焼酎は、税法上の区分ではどれにあたる？","単式蒸留焼酎（旧・乙類）","連続式蒸留焼酎（旧・甲類）","リキュール","スピリッツ","単式蒸留で原料の風味を残すのが本格焼酎。甲類はクセが少なくサワーのベース向きです。","焼酎"],
+ ["テキーラの原料になる植物は？","アガベ（リュウゼツラン）","サトウキビ","トウモロコシ","サボテン","アガベ・テキラーナの株（ピニャ）を蒸して糖化・発酵させます。サボテンではありません。","洋酒"],
+ ["「シングルモルト」ウイスキーとは？","1つの蒸留所のモルトウイスキーだけで造ったもの","1回だけ蒸留したもの","1年だけ熟成したもの","1つの樽だけで熟成したもの","1つの樽だけから瓶詰めしたものは「シングルカスク」と呼びます。","洋酒"],
+ ["「シャンパン」を名乗れるのは、フランスのどの地方のスパークリングワイン？","シャンパーニュ","ボルドー","ブルゴーニュ","アルザス","原産地呼称で保護され、他の地域のものはクレマンやスプマンテなど別の名前になります。","ワイン"],
+ ["赤ワインの赤い色はブドウのどこから来る？","果皮","果肉","種","茎","赤ワインは果皮ごと漬け込んで発酵させるため色と渋みが出ます。","ワイン"],
+ ["ワインのフルボトル1本の標準的な容量は？","750ml","500ml","700ml","1000ml","ちなみに国産ウイスキーは700mlが主流です。","ワイン"],
+ ["カクテル「モスコミュール」のベースのお酒は？","ウォッカ","ジン","ラム","テキーラ","ウォッカにライム、ジンジャーエール（またはジンジャービア）。","カクテル"],
+ ["カクテル「モヒート」のベースのお酒は？","ラム","ウォッカ","ジン","ウイスキー","ラムにミント、ライム、砂糖、ソーダ。キューバ生まれです。","カクテル"],
+ ["カクテル「マルガリータ」のベースのお酒は？","テキーラ","ラム","ジン","ブランデー","グラスの縁に塩をつける「スノースタイル」が定番。","カクテル"],
+ ["バーで言う「チェイサー」とは？","強いお酒の合間に飲む水など","2軒目のお店","締めのラーメン","追加の1杯","水を挟むと酔いの回りがゆるやかになります。","マナー"],
+ ["関西で「お通し」をよく何と呼ぶ？","突き出し","先付け","箸休め","前菜盛り","店側が注文前に出す小鉢。関東は「お通し」、関西は「突き出し」が多い呼び方です。","居酒屋"],
+ ["宴会の締め「一本締め」で手を打つ回数は？","10回","1回","3回","7回","「シャシャシャン」×3＋「シャン」で10回。1回だけ打つのは「一丁締め」です。","マナー"],
+ ["二日酔いの主な原因とされる物質は？","アセトアルデヒド","カフェイン","クエン酸","ヒスタミン","アルコールが分解される途中でできる物質で、頭痛や吐き気の原因になります。","健康"],
+ ["国の指針で「節度ある適度な飲酒」とされる純アルコール量は1日平均でおよそ？","20g","50g","80g","100g","ビールなら中瓶1本（500ml）程度。ほどほどが一番です。","健康"],
+ ["ハイボールのいちばん基本的な割り材は？","炭酸水","トニックウォーター","水","コーラ","ウイスキー＋炭酸水。トニックで割るとほのかに甘く苦い別物になります。","洋酒"]
+ ]},
+{id:"itp-mock",title:"ITパスポート 模擬",tag:"IT",desc:"出題範囲（ストラテジ・マネジメント・テクノロジ）に沿ったオリジナル問題。",passLine:60,
+ q:[
+ ["稼働率0.9の装置を2台直列につないだシステム全体の稼働率は？","0.81","0.99","0.90","0.18","直列はどちらも動いている必要があるので 0.9×0.9＝0.81。","テクノロジ"],
+ ["稼働率0.9の装置を2台並列につないだ（どちらか1台動けばよい）システムの稼働率は？","0.99","0.81","0.90","1.80","両方止まる確率は 0.1×0.1＝0.01。よって 1−0.01＝0.99。","テクノロジ"],
+ ["2進数 1011 を10進数で表すと？","11","13","9","1011","8＋0＋2＋1＝11。","テクノロジ"],
+ ["DNSの主な役割は？","ドメイン名とIPアドレスを対応づける","IPアドレスを自動で割り当てる","メールを送信する","通信を暗号化する","IPアドレスの自動割当はDHCP、メール送信はSMTPの役割です。","テクノロジ"],
+ ["RAID1の特徴として正しいものは？","同じデータを2台に書き込む（ミラーリング）","データを分散して書き込み高速化する","パリティを分散して記録する","容量が2倍になる","RAID0はストライピング、RAID5はパリティ分散です。","テクノロジ"],
+ ["二要素認証にあたる組み合わせは？","パスワード＋スマホに届く確認コード","パスワード＋秘密の質問","指紋＋静脈","PIN＋パスワード","知識・所持・生体のうち異なる2種類を組み合わせるのが二要素認証です。","セキュリティ"],
+ ["データを暗号化して使えなくし、元に戻すことと引き換えに金銭を要求するマルウェアは？","ランサムウェア","スパイウェア","アドウェア","ワーム","ransom＝身代金。定期的なバックアップが有効な対策です。","セキュリティ"],
+ ["実在の企業を装ったメールで偽サイトに誘導し、IDやパスワードを盗む手口は？","フィッシング","ソーシャルエンジニアリング","DoS攻撃","SQLインジェクション","リンクを開かず、公式アプリやブックマークから確認するのが基本です。","セキュリティ"],
+ ["PDCAサイクルの「C」は何？","Check（評価）","Change（変更）","Control（管理）","Create（作成）","Plan→Do→Check→Act（改善）。","マネジメント"],
+ ["SLAとは何の略で、どういうもの？","サービスレベル合意。提供者と利用者がサービスの品質水準を取り決めたもの","システムの設計書","ソフトウェアの利用許諾契約","セキュリティ監査の報告書","Service Level Agreement。稼働率や復旧時間などを数値で合意します。","マネジメント"],
+ ["アジャイル開発の代表的な手法は？","スクラム","ウォーターフォール","PERT","ABC分析","スクラムは短い期間（スプリント）を繰り返して開発を進めます。","マネジメント"],
+ ["固定費100万円、変動費率0.6のとき、損益分岐点売上高は？","250万円","160万円","166万円","60万円","固定費÷（1−変動費率）＝100÷0.4＝250万円。","ストラテジ"],
+ ["個人情報保護法の「要配慮個人情報」にあたるものは？","病歴","氏名","メールアドレス","生年月日","人種、信条、病歴、犯罪の経歴などで、取得には原則本人の同意が必要です。","ストラテジ"],
+ ["著作権法で保護されないものは？","アルゴリズム","プログラムのソースコード","操作マニュアル","Webサイトの文章","プログラムは保護されますが、その解法（アルゴリズム）やプログラム言語そのものは保護されません。","ストラテジ"],
+ ["売上の大きい順に品目を並べ、累積比率でA・B・Cに分けて重点管理する手法は？","ABC分析","SWOT分析","PPM","3C分析","パレート図を使い、上位の品目に管理の力を集中させます。","ストラテジ"],
+ ["モノがインターネットにつながり、データをやり取りする仕組みを何という？","IoT","AI","RPA","VR","Internet of Things。センサーや家電、工場の機械などが対象です。","ストラテジ"]
+ ]}
+].map(p=>({...p,builtin:true,questions:p.q.map(r=>({q:r[0],choices:[r[1],r[2],r[3],r[4]],exp:r[5]||"",cat:r[6]||""}))}));
+
+/* ---------- 状態 ---------- */
+const S={view:"home",packId:null,custom:[],scores:[],count:10,timer:true,quiz:null,lastScoreId:null,draft:null};
+let isEditor=false,db=null,user=null,uid=null,canWrite=null,sample=null,unsubScores=null,toastT=null;
+const store={get(k,d){try{const v=localStorage.getItem("nomiken:"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem("nomiken:"+k,JSON.stringify(v))}catch(e){}}};
+S.name=store.get("name","");S.count=store.get("count",10);S.timer=store.get("timer",true);
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+S.local=store.get("packs",[]);S.localScores=store.get("scores",[]);S.partyNames=store.get("party","");
+const allPacks=()=>[...BUILTIN,...S.custom,...S.local];
+const shared=()=>!!db&&canWrite!==false;
+const pack=()=>allPacks().find(p=>p.id===S.packId);
+function toast(m){const t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,2600)}
+function go(v){S.view=v;stopTimer();render();window.scrollTo(0,0)}
+
+/* 共有データ（外部版はスマホ内保存のみ） */
+function subScores(){
+  if(unsubScores){unsubScores();unsubScores=null}
+  S.scores=[];
+  if(!db||!S.packId) return;
+  unsubScores=db.collection("scores").where("packId","==",S.packId).limit(500).onSnapshot(snap=>{
+    S.scores=snap.docs.map(d=>({id:d.id,...d.data()}));renderRanking();
+  },()=>{});
+}
+
+/* ---------- 画面 ---------- */
+function render(){
+  $("#who").textContent=S.name?S.name+" さん":"";
+  const v=S.view, app=$("#app");
+  if(v==="home") app.innerHTML=homeHTML(), bindHome(), renderPacks();
+  else if(v==="pack") app.innerHTML=packHTML(), bindPack(), renderRanking();
+  else if(v==="quiz") app.innerHTML=quizHTML(), bindQuiz();
+  else if(v==="result") app.innerHTML=resultHTML(), bindResult(), renderRanking();
+  else if(v==="make") app.innerHTML=makeHTML(), bindMake();
+  else if(v==="handoff") app.innerHTML=handoffHTML(), bindHandoff();
+  else if(v==="share") app.innerHTML=shareHTML(), bindShare();
+  else if(v==="party") app.innerHTML=partyHTML(), bindParty();
+}
+
+function homeHTML(){return `
+ <section class="card" style="display:flex;flex-direction:column;gap:10px">
+  <label class="fld" for="name">ニックネーム（ランキングに表示されます）
+   <input type="text" id="name" maxlength="16" placeholder="例：幹事のたなか" value="${esc(S.name)}"></label>
+ </section>
+ <section style="display:flex;flex-direction:column;gap:10px">
+  <h2 class="sec">問題集をえらぶ</h2>
+  <div class="packs" id="packs"></div>
+ </section>
+ <section class="card" style="display:flex;flex-direction:column;gap:10px">
+  <h3>自分の検定をつくる</h3>
+  <p class="muted tiny" style="margin:0">飲み会の身内ネタから資格試験の過去問まで。テキストやExcelから貼り付けて作れます。作った問題集はテキストにしてLINEなどで送れば、ほかの人のスマホにも取り込めます。</p>
+  <button class="btn ghost" id="toMake" type="button">問題集を作る</button>
+ </section>`}
+function bindHome(){
+  $("#name").addEventListener("input",e=>{S.name=e.target.value.trim();store.set("name",S.name);$("#who").textContent=S.name?S.name+" さん":""});
+  $("#toMake").onclick=()=>{S.draft=null;go("make")};
+}
+function renderPacks(){
+  const el=$("#packs");if(!el)return;
+  el.innerHTML=allPacks().map(p=>`<button class="pack" type="button" data-id="${esc(p.id)}">
+    <span class="tag">${esc((p.tag||"自").slice(0,2))}</span>
+    <span class="bd"><span class="tt">${esc(p.title)}${p.builtin?"":`<span class="chip">${p.local?"このスマホ":"共有"}</span>`}</span>
+    <span class="ds">${esc(p.desc)}</span>
+    <span class="meta">${p.questions.length}問 ・ 合格ライン ${p.passLine}%${p.author?" ・ 作成 "+esc(p.author):""}</span></span></button>`).join("")
+   + (db?"":`<p class="muted tiny" style="margin:0">作った問題集と記録はこのスマホに保存されます。</p>`);
+  el.querySelectorAll(".pack").forEach(b=>b.onclick=()=>{S.packId=b.dataset.id;subScores();go("pack")});
+}
+
+function packHTML(){const p=pack();if(!p)return `<p>問題集が見つかりません。</p>`;
+ const n=p.questions.length,opts=[5,10,20].filter(x=>x<n);
+ const mine=!!p.uid&&p.uid===uid, canDel=!p.builtin&&p.id!=="draft"&&(p.local||mine||isEditor);
+ return `
+ <button class="btn ghost small" id="back" type="button">← 問題集一覧</button>
+ <section style="display:flex;flex-direction:column;gap:6px">
+  <h1 style="font-family:var(--display);font-size:1.7rem;font-weight:400">${esc(p.title)}</h1>
+  <p class="muted" style="margin:0">${esc(p.desc)}</p>
+  <p class="tiny muted" style="margin:0">全${n}問 ・ 合格ライン ${p.passLine}%</p>
+ </section>
+ <section class="card" style="display:flex;flex-direction:column;gap:14px">
+  <div class="fld" style="display:flex;flex-direction:column;gap:6px"><span class="tiny muted">出題数</span>
+   <div class="seg" id="cnt">${opts.map(x=>`<button type="button" data-n="${x}" aria-pressed="${S.count===x}">${x}問</button>`).join("")}<button type="button" data-n="0" aria-pressed="${!opts.includes(S.count)}">全${n}問</button></div></div>
+  <div style="display:flex;flex-direction:column;gap:6px"><span class="tiny muted">制限時間</span>
+   <div class="seg" id="tmr"><button type="button" data-t="1" aria-pressed="${S.timer}">1問20秒</button><button type="button" data-t="0" aria-pressed="${!S.timer}">なし（じっくり）</button></div></div>
+  ${S.name?"":`<label class="fld" for="name2">ニックネーム<input type="text" id="name2" maxlength="16" placeholder="ランキング用の名前"></label>`}
+  <button class="btn ghost" id="start" type="button">ひとりで受検</button>
+ </section>
+ <section class="card" style="display:flex;flex-direction:column;gap:10px">
+  <h3>パーティーモード</h3>
+  <p class="tiny muted" style="margin:0">スマホ1台を順番に回して、全員同じ問題で勝負。正解は全員が答え終わってから発表します。出題数と制限時間は上の設定を使います。</p>
+  <label class="fld" for="pnames">参加者の名前（スペースか「、」で区切る）<input type="text" id="pnames" maxlength="160" value="${esc(S.partyNames)}" placeholder="たなか すずき さとう"></label>
+  <button class="btn" id="pstart" type="button">みんなで勝負（<span id="pcount">0</span>人）</button>
+ </section>
+ <section class="card" style="display:flex;flex-direction:column;gap:8px">
+  <div class="row" style="align-items:center"><h3 style="flex:2 1 auto">${shared()?"ランキング":"このスマホのランキング"}</h3>
+   <div class="seg" style="flex:0 0 auto" id="scope"><button type="button" data-s="today" aria-pressed="${(S.scope||"today")==="today"}">今日</button><button type="button" data-s="all" aria-pressed="${S.scope==="all"}">全期間</button></div></div>
+  <div id="rank"></div>
+ </section>
+ <div class="row">
+  <button class="btn ghost small" id="copyTxt" type="button">テキストでコピー（LINEで送れる）</button>
+  <button class="btn ghost small" id="copyEdit" type="button">この問題集をもとに新しく作る</button>
+  ${canDel?`<button class="btn ghost small" id="del" type="button" style="color:var(--bad)">この問題集を削除</button>`:""}
+ </div>
+ <textarea id="copyBox" hidden readonly aria-label="問題集テキスト" style="min-height:160px"></textarea>
+ <div id="delConfirm" hidden class="card" style="display:flex;flex-direction:column;gap:8px"><p style="margin:0">「${esc(p.title)}」を削除します。${p.local?"このスマホから消えます。":"みんなの画面からも消えます。"}</p><div class="row"><button class="btn ghost small" id="delNo" type="button">やめる</button><button class="btn small" id="delYes" type="button" style="background:var(--bad);color:#fff">削除する</button></div></div>`}
+function bindPack(){const p=pack();if(!p)return;
+ $("#back").onclick=()=>go("home");
+ $("#cnt").querySelectorAll("button").forEach(b=>b.onclick=()=>{S.count=+b.dataset.n;store.set("count",S.count);$("#cnt").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b))});
+ $("#tmr").querySelectorAll("button").forEach(b=>b.onclick=()=>{S.timer=b.dataset.t==="1";store.set("timer",S.timer);$("#tmr").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b))});
+ $("#scope").querySelectorAll("button").forEach(b=>b.onclick=()=>{S.scope=b.dataset.s;$("#scope").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));renderRanking()});
+ $("#start").onclick=()=>{const n2=$("#name2");if(n2&&n2.value.trim()){S.name=n2.value.trim();store.set("name",S.name)}startQuiz(p.questions)};
+ const pn=$("#pnames"),names=()=>pn.value.split(/[\s、,，]+/).map(s=>s.trim().slice(0,16)).filter(Boolean).slice(0,10);
+ const updP=()=>{const n=names().length;$("#pcount").textContent=n;$("#pstart").disabled=n<2;S.partyNames=pn.value;store.set("party",pn.value)};
+ pn.addEventListener("input",updP);updP();
+ $("#pstart").onclick=()=>startParty(p,names());
+ $("#copyTxt").onclick=()=>{const t=packToText(p),box=$("#copyBox");
+  const fb=()=>{box.hidden=false;box.value=t;box.focus();box.select();toast("選択された文字をコピーしてください")};
+  try{navigator.clipboard.writeText(t).then(()=>toast("コピーしました。LINEなどに貼り付けて送れます"),fb)}catch(e){fb()}};
+ $("#copyEdit").onclick=()=>{S.draft=packToText({...p,title:p.title+"（改）"});go("make")};
+ const del=$("#del");if(del){del.onclick=()=>{$("#delConfirm").hidden=false};$("#delNo").onclick=()=>{$("#delConfirm").hidden=true};
+  $("#delYes").onclick=async()=>{if(p.local){S.local=S.local.filter(x=>x.id!==p.id);store.set("packs",S.local);toast("削除しました");go("home");return}try{await db.doc("packs/"+p.docId).delete();toast("削除しました");go("home")}catch(e){toast("削除できませんでした")}}}
+}
+function renderRanking(){
+  const el=$("#rank");if(!el)return;
+  const src=shared()?S.scores:S.localScores.filter(r=>r.packId===S.packId);
+  const today=new Date();today.setHours(0,0,0,0);
+  let rows=src.filter(r=>S.view==="result"||(S.scope==="all")||(r.at||0)>=today.getTime());
+  rows.sort((a,b)=>(b.pct-a.pct)||(a.timeMs-b.timeMs));
+  rows=rows.slice(0,10);
+  if(!rows.length){el.innerHTML=`<p class="muted tiny" style="margin:0">${S.scope==="all"?"まだ記録がありません。":"今日の記録はまだありません。"}最初の受検者になりましょう。</p>`;return}
+  el.innerHTML=`<ol class="rank">${rows.map((r,i)=>`<li class="${r.id===S.lastScoreId?"me":""}"><span class="n">${i+1}</span><span class="nm">${esc(r.name||"名無し")}</span><span>${r.score}/${r.total}</span><span class="tm">${(r.timeMs/1000).toFixed(1)}秒</span></li>`).join("")}</ol>`;
+}
+
+/* ---------- 出題 ---------- */
+let tmr=null;
+function stopTimer(){if(tmr){clearInterval(tmr);tmr=null}}
+const prepQs=(src,all)=>{let qs=shuffle(src);if(!all&&S.count&&S.count<qs.length)qs=qs.slice(0,S.count);
+  return qs.map(q=>{const order=shuffle(q.choices.map((c,i)=>i));return{...q,ch:order.map(i=>q.choices[i]),ans:order.indexOf(0)}})};
+function startQuiz(source,review=false){
+  S.party=null;
+  S.quiz={qs:prepQs(source,review),i:0,log:[],review,qStart:Date.now(),answered:false,saved:false};
+  go("quiz");
+}
+function startParty(p,names){S.party={players:names.map(n=>({name:n,log:[]})),cur:0,qs:prepQs(p.questions,false),dare:null,saved:false};go("handoff")}
+function handoffHTML(){const P=S.party,pl=P.players[P.cur];return `
+ <section class="card handoff">
+  <span class="tiny muted">${esc(pack().title)} ・ ${P.cur+1}人目 / ${P.players.length}人</span>
+  <span class="tiny">次に答える人</span>
+  <span class="hname">${esc(pl.name)} さん</span>
+  <p class="muted" style="margin:0">${P.cur?"スマホを渡してください。前の人の答えは表示されません。":"準備ができたらスタート。"}</p>
+  <p class="tiny muted" style="margin:0">全${P.qs.length}問${S.timer?" ・ 1問20秒":""}</p>
+  <button class="btn" id="go" type="button">${esc(pl.name)} さん、スタート</button>
+ </section>
+ <button class="btn ghost small" id="quit" type="button" style="align-self:flex-start">パーティーをやめる</button>`}
+function bindHandoff(){
+ $("#go").onclick=()=>{S.quiz={qs:S.party.qs,i:0,log:[],review:false,party:true,saved:true,answered:false,qStart:Date.now()};go("quiz")};
+ $("#quit").onclick=()=>{S.party=null;go("pack")};
+}
+const DARES=["隣の人のいいところを3つ言う","最近あった小さな幸せを1つ話す","次の注文を全員分とりまとめる","好きな食べ物ベスト3を理由つきで発表","得意なモノマネを1つ","全員のグラスに水を注いで回る","次の勝負の問題を1問つくって出題する","一発ギャグ（すべってもOK）","自分の第一印象をみんなに聞く","乾杯の音頭をもう一度とる"];
+function partyHTML(){const P=S.party,p=pack(),N=P.qs.length;
+ const ranked=P.players.map(pl=>{const sc=pl.log.filter(l=>l.ok).length;return{name:pl.name,sc,t:pl.log.reduce((a,l)=>a+l.ms,0),pct:Math.round(sc/N*100)}}).sort((a,b)=>(b.sc-a.sc)||(a.t-b.t));
+ if(!P.saved){P.saved=true;ranked.forEach(r=>saveScore(p,r.sc,N,r.pct,r.t,r.name));S.lastScoreId=null}
+ if(P.dare==null)P.dare=Math.floor(Math.random()*DARES.length);
+ const top=ranked[0],last=ranked[ranked.length-1];
+ return `
+ <section class="card score"><span class="tiny muted">${esc(p.title)} ・ パーティー結果</span>
+  <span class="tiny">優勝</span><span class="hname">${esc(top.name)} さん</span>
+  <span class="muted" style="font-variant-numeric:tabular-nums">${top.sc} / ${N}問正解 ・ ${(top.t/1000).toFixed(1)}秒</span></section>
+ <section class="card" style="display:flex;flex-direction:column;gap:6px"><h3>順位</h3><ol class="rank">${ranked.map((r,i)=>`<li><span class="n">${i+1}</span><span class="nm">${esc(r.name)}</span><span>${r.sc}/${N}</span><span class="tm">${(r.t/1000).toFixed(1)}秒</span></li>`).join("")}</ol></section>
+ <section class="card dare"><span class="tiny muted">最下位 ${esc(last.name)} さんへのお題</span><span class="dtext">${esc(DARES[P.dare])}</span><button class="btn ghost small" id="redraw" type="button">お題を引き直す</button></section>
+ <section class="card" style="display:flex;flex-direction:column;gap:8px"><h3>答え合わせ</h3><div class="gridwrap"><table class="grid"><thead><tr><th>問題</th>${P.players.map(pl=>`<th>${esc(pl.name)}</th>`).join("")}</tr></thead><tbody>${P.qs.map((q,qi)=>`<tr><td><span class="gq">${esc(q.q)}</span><span class="ga">正解：${esc(q.ch[q.ans])}</span></td>${P.players.map(pl=>{const l=pl.log[qi];return `<td class="${l&&l.ok?"o":"x"}">${l&&l.ok?"○":"×"}</td>`}).join("")}</tr>`).join("")}</tbody></table></div></section>
+ <div class="row"><button class="btn" id="again" type="button">同じメンバーでもう一回</button><button class="btn ghost" id="home" type="button">問題集一覧へ</button></div>`}
+function bindParty(){
+ $("#redraw").onclick=()=>{const P=S.party;let n;do{n=Math.floor(Math.random()*DARES.length)}while(n===P.dare);P.dare=n;render()};
+ $("#again").onclick=()=>startParty(pack(),S.party.players.map(x=>x.name));
+ $("#home").onclick=()=>{S.party=null;go("home")};
+}
+function quizHTML(){const z=S.quiz,q=z.qs[z.i];return `
+ <div class="qhead"><span class="qno">第${z.i+1}問<small> / ${z.qs.length}</small></span><span class="tiny muted">${esc(q.cat||"")}${z.review?" ・ 復習":""}${z.party?" ・ "+esc(S.party.players[S.party.cur].name)+" さん":""}</span></div>
+ ${S.timer&&!z.review?`<div class="timer" id="bar"><i></i></div>`:""}
+ <p class="qtext">${esc(q.q)}</p>
+ <div class="choices">${q.ch.map((c,i)=>`<button class="choice" type="button" data-i="${i}"><b>${"ABCDEF"[i]}</b><span>${esc(c)}</span></button>`).join("")}</div>
+ <div id="fb"></div>
+ <button class="btn ghost small" id="quit" type="button" style="align-self:flex-start">中断してもどる</button>`}
+function bindQuiz(){const z=S.quiz;z.qStart=Date.now();z.answered=false;
+ document.querySelectorAll(".choice").forEach(b=>b.onclick=()=>answer(+b.dataset.i));
+ $("#quit").onclick=()=>{S.party=null;go("pack")};
+ if(S.timer&&!z.review){const LIM=20000,bar=$("#bar");
+  tmr=setInterval(()=>{const left=Math.max(0,LIM-(Date.now()-z.qStart));bar.firstChild.style.width=(left/LIM*100)+"%";bar.classList.toggle("low",left<5000);if(!left)answer(-1)},100)}
+}
+function answer(i){const z=S.quiz;if(z.answered)return;z.answered=true;stopTimer();
+ const q=z.qs[z.i],ok=i===q.ans;z.log.push({q,chosen:i,ok,ms:Date.now()-z.qStart});
+ if(z.party){
+  document.querySelectorAll(".choice").forEach((b,k)=>{b.disabled=true;if(k===i)b.classList.add("picked")});
+  $("#fb").innerHTML=`<p class="tiny muted" style="margin:0">${i<0?"時間切れ":"回答しました"}。正解は最後に発表します。</p>`;
+  const lastQ=z.i+1>=z.qs.length;
+  setTimeout(()=>{if(S.view!=="quiz"||!S.party)return;
+   if(!lastQ){z.i++;go("quiz");return}
+   const P=S.party;P.players[P.cur].log=z.log;P.cur++;go(P.cur<P.players.length?"handoff":"party")},500);
+  return}
+ document.querySelectorAll(".choice").forEach((b,k)=>{b.disabled=true;if(k===q.ans)b.classList.add("ok");else if(k===i)b.classList.add("ng")});
+ const last=z.i+1>=z.qs.length;
+ $("#fb").innerHTML=`<div class="fb ${ok?"ok":"ng"}"><span class="v">${ok?"正解":i<0?"時間切れ":"不正解"}</span>
+  ${ok?"":`<span>正解は「${esc(q.ch[q.ans])}」</span>`}${q.exp?`<span class="tiny">${esc(q.exp)}</span>`:""}</div>
+  <button class="btn" id="next" type="button" style="margin-top:12px">${last?"結果を見る":"次の問題へ"}</button>`;
+ $("#next").onclick=()=>{if(last)go("result");else{z.i++;go("quiz")}};
+ $("#next").focus({preventScroll:true});$("#fb").scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+
+/* ---------- 結果 ---------- */
+function resultHTML(){const z=S.quiz,p=pack(),score=z.log.filter(l=>l.ok).length,total=z.log.length,pct=Math.round(score/total*100),pass=pct>=p.passLine;
+ const time=z.log.reduce((a,l)=>a+l.ms,0);
+ const title=p.titles?p.titles.find(t=>pct>=t[0])[1]:"";
+ const miss=z.log.filter(l=>!l.ok);
+ if(!z.review&&!z.saved){z.saved=true;saveScore(p,score,total,pct,time)}
+ return `
+ <section class="card score">
+  <span class="tiny muted">${esc(p.title)}${z.review?"（復習）":""}</span>
+  <span class="big">${score}<small> / ${total}</small></span>
+  <span class="muted" style="font-variant-numeric:tabular-nums">正答率 ${pct}% ・ 合格ライン ${p.passLine}% ・ ${(time/1000).toFixed(1)}秒</span>
+  <span class="stamp ${pass?"pass":"fail"}">${pass?"合格":"不合格"}</span>
+  ${title?`<span style="font-weight:700;margin-top:6px">称号：${esc(title)}</span>`:""}
+ </section>
+ <div class="row"><button class="btn" id="again" type="button">もう一度受ける</button>${miss.length?`<button class="btn ghost" id="review" type="button">間違えた${miss.length}問を復習</button>`:""}</div>
+ ${z.review?"":`<section class="card" style="display:flex;flex-direction:column;gap:8px"><h3>ランキング（${esc(p.title)}）</h3><div id="rank"></div></section>`}
+ ${miss.length?`<section class="card" style="display:flex;flex-direction:column;gap:10px"><h3>間違えた問題</h3><div class="miss">${miss.map(l=>`<div><p style="margin:0;font-weight:700">${esc(l.q.q)}</p><p style="margin:0" class="tiny">あなた：${l.chosen<0?"時間切れ":esc(l.q.ch[l.chosen])} → 正解：<b>${esc(l.q.ch[l.q.ans])}</b></p>${l.q.exp?`<p style="margin:0" class="tiny muted">${esc(l.q.exp)}</p>`:""}</div>`).join("")}</div></section>`:""}
+ <button class="btn ghost" id="home" type="button">問題集一覧へ</button>`}
+function bindResult(){const z=S.quiz;
+ $("#again").onclick=()=>startQuiz(pack().questions);
+ const r=$("#review");if(r)r.onclick=()=>startQuiz(z.log.filter(l=>!l.ok).map(l=>({q:l.q.q,choices:l.q.choices,exp:l.q.exp,cat:l.q.cat})),true);
+ $("#home").onclick=()=>go("home");
+}
+async function saveScore(p,score,total,pct,timeMs,name){
+  if(p.id==="draft") return;
+  const rec={packId:p.id,name:(name||S.name||"名無し").slice(0,16),uid:uid||null,score,total,pct,timeMs,at:Date.now()};
+  if(!shared()){rec.id="l"+Date.now()+Math.random().toString(36).slice(2,6);S.localScores=[...S.localScores,rec].slice(-300);store.set("scores",S.localScores);S.lastScoreId=rec.id;return}
+  const ref=db.collection("scores").doc();S.lastScoreId=ref.id;
+  try{await ref.set(rec)}
+  catch(e){S.lastScoreId=null;toast(e&&e.code==="quota_exceeded"?"記録の保存枠がいっぱいです":"ランキングに記録できませんでした")}
+}
+
+/* ---------- 問題集づくり ---------- */
+const SAMPLE=`タイトル: 〇〇部 忘年会検定
+説明: 今年の部署の出来事クイズ
+合格ライン: 60
+タグ: 部
+
+Q: 部長が今年いちばん多く言った口ぐせは？
+正解: とりあえずやってみよう
+誤答: 前例がないね
+誤答: 持ち帰って検討します
+誤答: それ、いいね
+解説: 会議の議事録から数えました（全38回）`;
+function packToText(p){return [`タイトル: ${p.title}`,`説明: ${p.desc||""}`,`合格ライン: ${p.passLine||60}`,`タグ: ${p.tag||""}`,""].concat(p.questions.map(q=>[`Q: ${q.q}`,`正解: ${q.choices[0]}`,...q.choices.slice(1).map(c=>`誤答: ${c}`),q.exp?`解説: ${q.exp}`:"",q.cat?`分野: ${q.cat}`:""].filter(Boolean).join("\n"))).join("\n\n")}
+function parsePack(text){
+  const out={title:"",desc:"",passLine:60,tag:"",questions:[],errors:[]};
+  const lines=text.replace(/\r/g,"").split("\n");let cur=null;
+  const kv=l=>{const m=l.match(/^\s*([^:：]{1,8})\s*[:：]\s*(.*)$/);return m?[m[1].trim(),m[2].trim()]:null};
+  const push=()=>{if(cur){if(!cur.q)out.errors.push("問題文のない問題があります");else if(!cur.choices[0])out.errors.push(`「${cur.q.slice(0,14)}…」に正解がありません`);else if(cur.choices.length<2)out.errors.push(`「${cur.q.slice(0,14)}…」に誤答がありません`);else out.questions.push(cur)}cur=null};
+  lines.forEach((l,n)=>{
+    if(!l.trim())return;
+    if(l.includes("\t")){const c=l.split("\t").map(s=>s.trim());if(/^問題/.test(c[0]))return;
+      push();const exp=c.length>=6?c[5]:"";const ch=[c[1],...c.slice(2,5)].filter(Boolean);
+      if(c[0]&&ch.length>=2)out.questions.push({q:c[0],choices:ch,exp,cat:c[6]||""});else out.errors.push(`${n+1}行目：問題・正解・誤答がそろっていません`);return}
+    const p=kv(l);
+    if(p&&/^(Q|Ｑ|問題|問)$/i.test(p[0])){push();cur={q:p[1],choices:[""],exp:"",cat:""};return}
+    if(!cur){if(p){const [k,v]=p;if(/タイトル|題名/.test(k))out.title=v;else if(/説明/.test(k))out.desc=v;else if(/合格/.test(k))out.passLine=Math.min(100,Math.max(0,parseInt(v)||60));else if(/タグ/.test(k))out.tag=v.slice(0,2)}return}
+    if(p&&/^(正解|答え|A|Ａ)$/i.test(p[0]))cur.choices[0]=p[1];
+    else if(p&&/^(誤答|誤|ハズレ|[B-FＢ-Ｆ])$/i.test(p[0]))cur.choices.push(p[1]);
+    else if(p&&/^解説$/.test(p[0]))cur.exp=p[1];
+    else if(p&&/^(分野|カテゴリ)$/.test(p[0]))cur.cat=p[1];
+    else if(cur.exp)cur.exp+="\n"+l.trim();else cur.q+="\n"+l.trim();
+  });push();
+  if(!out.title)out.errors.unshift("「タイトル: 」の行を入れてください");
+  return out;
+}
+function makeHTML(){return `
+ <button class="btn ghost small" id="back" type="button">← 問題集一覧</button>
+ <h1 style="font-family:var(--display);font-size:1.5rem;font-weight:400">問題集をつくる</h1>
+ ${sample?`<section class="card" style="display:flex;flex-direction:column;gap:10px">
+  <h3>テーマからAIで下書き</h3>
+  <label class="fld" for="theme">テーマ<input type="text" id="theme" placeholder="例：日本酒の基礎 / 日商簿記3級の仕訳 / 新入社員の自己紹介"></label>
+  <div class="row"><select id="gn" aria-label="問題数"><option value="5">5問</option><option value="10" selected>10問</option><option value="15">15問</option></select><button class="btn small" id="gen" type="button">下書きを作る</button></div>
+  <p class="tiny muted" style="margin:0" id="genMsg">下書きは下の欄に入ります。共有する前に答えが正しいか確認してください。</p>
+ </section>`:""}
+ <section class="card" style="display:flex;flex-direction:column;gap:10px">
+  <h3>問題を貼り付け</h3>
+  <textarea id="src" aria-label="問題集テキスト" spellcheck="false">${esc(S.draft||SAMPLE)}</textarea>
+  <details><summary class="tiny">書き方</summary>
+   <div class="tiny muted" style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+    <span>1行ずつ「Q:」「正解:」「誤答:」「解説:」で書きます。誤答は1〜5個。○×問題なら正解と誤答を1つずつ。選択肢は出題時にシャッフルされます。</span>
+    <span>Excelやスプレッドシートからは、列を「問題｜正解｜誤答1｜誤答2｜誤答3｜解説」の順に並べてそのままコピー＆貼り付けできます。</span>
+    <pre class="fmt">タイトル: ○○検定
+合格ライン: 70
+Q: 問題文
+正解: 正しい答え
+誤答: まちがい1
+誤答: まちがい2
+解説: 補足説明</pre></div></details>
+  <div id="pv" class="tiny"></div>
+  <div class="row"><button class="btn ghost" id="try" type="button">保存せずに試す</button><button class="btn${shared()?" ghost":""}" id="saveLocal" type="button">このスマホに保存</button></div>
+  ${shared()?`<button class="btn" id="save" type="button">保存してみんなに共有</button>`:""}
+ </section>`}
+function bindMake(){
+ $("#back").onclick=()=>go("home");
+ const src=$("#src"),pv=$("#pv");
+ const upd=()=>{S.draft=src.value;const r=parsePack(src.value);
+  pv.innerHTML=`<span style="font-weight:700">${r.questions.length}問を読み取りました</span>${r.title?` ・ ${esc(r.title)}`:""}${r.errors.slice(0,4).map(e=>`<div class="err">${esc(e)}</div>`).join("")}`;
+  const ok=!!(r.questions.length&&r.title);$("#try").disabled=$("#saveLocal").disabled=!ok;
+  if($("#save"))$("#save").disabled=!ok;
+  return r};
+ src.addEventListener("input",upd);upd();
+ $("#saveLocal").onclick=()=>{const r=upd(),id="l-"+Date.now();
+  const np={id,local:true,title:r.title.slice(0,40),desc:r.desc.slice(0,120),tag:r.tag||"自",passLine:r.passLine,questions:r.questions.slice(0,300),at:Date.now()};
+  try{localStorage.setItem("nomiken:packs",JSON.stringify([np,...S.local]))}catch(e){toast("このスマホに保存できませんでした");return}
+  S.local=[np,...S.local];S.draft=null;toast("このスマホに保存しました");S.packId=id;subScores();go("pack")};
+ $("#try").onclick=()=>{const r=upd();const id="draft";const i=S.custom.findIndex(p=>p.id===id);if(i>=0)S.custom.splice(i,1);
+  S.custom.push({id,title:r.title+"（試し）",tag:r.tag||"試",desc:r.desc,passLine:r.passLine,questions:r.questions});S.packId=id;subScores();startQuiz(r.questions,false)};
+ if($("#save"))$("#save").onclick=async()=>{const r=upd();const b=$("#save");b.disabled=true;b.textContent="保存中…";
+  try{const ref=db.collection("packs").doc();await ref.set({title:r.title.slice(0,40),desc:r.desc.slice(0,120),tag:r.tag||"自",passLine:r.passLine,questions:r.questions.slice(0,300),uid:uid||null,author:(S.name||"").slice(0,16),at:Date.now()});
+   S.draft=null;toast("共有しました");S.packId="c-"+ref.id;subScores();go("pack")}
+  catch(e){b.disabled=false;b.textContent="保存してみんなに共有";toast(e&&e.code==="quota_exceeded"?"保存枠がいっぱいです。古い問題集を削除してください":"保存できませんでした（大きすぎるか、権限がありません）")}};
+ const gen=$("#gen");if(gen)gen.onclick=async()=>{const theme=$("#theme").value.trim();if(!theme){$("#theme").focus();return}
+  const n=+$("#gn").value,msg=$("#genMsg");gen.disabled=true;msg.textContent="作成中…（20秒ほどかかります）";
+  try{const j=await sample.json(`あなたは検定試験の作問者です。テーマ「${theme}」について、日本語の4択問題を${n}問作ってください。事実として確かなことだけを出題し、誤答はもっともらしく、ただし明確に誤りであるものにしてください。資格試験のテーマなら実際の出題範囲・形式に近づけてください。飲み会向けのテーマなら楽しく、ただし飲酒を強要する内容は避けてください。
+次のJSONだけを返してください:
+{"title":"〇〇検定（20字以内）","desc":"説明（40字以内）","tag":"漢字1〜2字","passLine":60から80の整数,"questions":[{"q":"問題文","correct":"正解","wrong":["誤答","誤答","誤答"],"exp":"解説（60字以内）","cat":"分野"}]}`,{modelTier:"default"});
+   const p={title:j.title||theme+"検定",desc:j.desc||"",tag:j.tag||"",passLine:j.passLine||60,questions:(j.questions||[]).filter(q=>q&&q.q&&q.correct).map(q=>({q:q.q,choices:[q.correct,...(q.wrong||[])],exp:q.exp||"",cat:q.cat||""}))};
+   src.value=packToText(p);upd();msg.textContent=`${p.questions.length}問の下書きができました。答えを確認してから共有してください。`}
+  catch(e){msg.textContent=e&&e.code==="not_granted"?"AIの利用が許可されていません。":e&&e.code==="rate_limited"?"混み合っています。少し待ってからもう一度どうぞ。":"作成できませんでした。テーマを変えて試してください。"}
+  finally{gen.disabled=false}};
+}
+function shareHTML(){return `
+ <button class="btn ghost small" id="back" type="button">← もどる</button>
+ <section class="card shareq">
+  <h1 style="font-family:var(--display);font-size:1.5rem;font-weight:400">QRで招待</h1>
+  <p class="muted" style="margin:0">スマホのカメラで読み取ると、このアプリが開きます。</p>
+  <div class="qrbox" id="qr" role="img" aria-label="ノミケンを開くQRコード"></div>
+  <code class="url" id="urlTxt">${APP_URL}</code>
+  <button class="btn" id="copyUrl" type="button">リンクをコピー</button>
+  <p class="tiny muted" style="margin:0">ログイン不要。開いた人のスマホですぐ遊べます。</p>
+ </section>`}
+function bindShare(){
+ $("#back").onclick=()=>go(S.prev||"home");
+ const box=$("#qr");
+ try{new QRCode(box,{text:APP_URL,width:240,height:240,colorDark:getComputedStyle(document.documentElement).getPropertyValue("--qr-dark").trim()||"#000000",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M})}
+ catch(e){box.style.aspectRatio="auto";box.style.color="#000";box.textContent="QRコードを表示できませんでした。下のリンクを送ってください。"}
+ $("#copyUrl").onclick=()=>{const fb=()=>{const r=document.createRange();r.selectNodeContents($("#urlTxt"));const s=getSelection();s.removeAllRanges();s.addRange(r);toast("選択されたリンクをコピーしてください")};
+  try{navigator.clipboard.writeText(APP_URL).then(()=>toast("リンクをコピーしました"),fb)}catch(e){fb()}};
+}
+$("#shareBtn").onclick=()=>{if(S.view==="share")return;S.prev=["home","pack","result","party"].includes(S.view)?S.view:"home";go("share")};
+$("#logo").onclick=()=>go("home");
+render();
+</script>
+
+</body>
+</html>
